@@ -1,0 +1,339 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.app{font-family:var(--font-sans);padding:12px;max-width:680px}
+.header{background:#0c2340;border-radius:12px;padding:12px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.header-title{color:#85c1e9;font-size:14px;font-weight:500;letter-spacing:1px}
+.header-time{color:#4a90c4;font-size:12px;font-family:monospace}
+.lcd{background:#0a1f35;border-radius:10px;padding:12px 16px;margin-bottom:10px;border:2px solid #0d2a4a}
+.lcd-line{font-family:'Courier New',monospace;font-size:16px;letter-spacing:2px;color:#00d4ff;min-height:22px;white-space:pre}
+.lcd-line.off{color:#0a2535}
+.patient-card{background:var(--color-background-secondary);border-radius:10px;border:0.5px solid var(--color-border-tertiary);padding:12px;margin-bottom:10px}
+.patient-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.avatar{width:40px;height:40px;border-radius:50%;background:#E6F1FB;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:#0C447C;flex-shrink:0}
+.patient-name{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.patient-sub{font-size:12px;color:var(--color-text-secondary)}
+.patient-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.field{background:var(--color-background-primary);border-radius:8px;padding:8px;border:0.5px solid var(--color-border-tertiary)}
+.field-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:2px}
+.field-val{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.stat{background:var(--color-background-secondary);border-radius:8px;padding:8px;text-align:center}
+.stat-n{font-size:20px;font-weight:500;color:var(--color-text-primary)}
+.stat-l{font-size:10px;color:var(--color-text-secondary);margin-top:2px}
+.status-row{display:flex;gap:8px;margin-bottom:10px}
+.pill{flex:1;border-radius:20px;padding:7px 6px;text-align:center;font-size:11px;font-weight:500;border:1px solid transparent;transition:all 0.3s}
+.p-ok{background:#EAF3DE;color:#27500A;border-color:#3B6D11}
+.p-warn{background:#FAEEDA;color:#412402;border-color:#854F0B}
+.p-alert{background:#FCEBEB;color:#501313;border-color:#A32D2D}
+.p-off{background:var(--color-background-secondary);color:var(--color-text-secondary);border-color:var(--color-border-tertiary)}
+.blink{animation:blink 0.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
+.reg-card{background:var(--color-background-secondary);border-radius:10px;border:0.5px solid var(--color-border-tertiary);padding:12px;margin-bottom:10px}
+.reg-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.reg-label{font-size:12px;color:var(--color-text-secondary);font-weight:500}
+.reg-val{font-size:18px;font-weight:500;color:var(--color-text-primary)}
+.drop-row{display:flex;gap:5px;align-items:center;margin:8px 0}
+.drop{width:10px;height:14px;background:#378ADD;border-radius:50% 50% 50% 50%/40% 40% 60% 60%;opacity:0;transition:opacity 0.1s}
+.drop.on{opacity:1}
+.nurse-card{background:#FCEBEB;border-radius:10px;border:1px solid #F09595;padding:12px;margin-bottom:10px;display:none}
+.nurse-title{font-size:13px;font-weight:500;color:#501313;margin-bottom:6px}
+.nurse-msg{font-size:12px;color:#791F1F}
+.log-card{background:var(--color-background-secondary);border-radius:10px;border:0.5px solid var(--color-border-tertiary);padding:12px;margin-bottom:10px}
+.log-title{font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px}
+.log-list{max-height:120px;overflow-y:auto}
+.log-item{display:flex;gap:8px;padding:5px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:11px}
+.log-time{color:var(--color-text-secondary);min-width:48px;font-family:monospace}
+.log-msg{color:var(--color-text-primary)}
+.log-badge{padding:2px 6px;border-radius:6px;font-size:10px;font-weight:500;flex-shrink:0}
+.badge-ok{background:#EAF3DE;color:#27500A}
+.badge-warn{background:#FAEEDA;color:#412402}
+.badge-alert{background:#FCEBEB;color:#501313}
+.btns{display:flex;gap:8px;margin-bottom:10px}
+.btn{flex:1;border:0.5px solid var(--color-border-secondary);border-radius:8px;padding:10px;font-size:13px;font-weight:500;cursor:pointer;background:var(--color-background-primary);color:var(--color-text-primary);transition:all 0.2s}
+.btn:active{transform:scale(0.97)}
+.btn-green{background:#EAF3DE;border-color:#3B6D11;color:#27500A}
+.btn-red{background:#FCEBEB;border-color:#A32D2D;color:#501313}
+.btn-blue{background:#E6F1FB;border-color:#185FA5;color:#0C447C}
+.setup-card{background:var(--color-background-primary);border-radius:10px;border:0.5px solid var(--color-border-tertiary);padding:14px;margin-bottom:10px}
+.setup-title{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:10px}
+.inp-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.inp-group{display:flex;flex-direction:column;gap:4px}
+.inp-label{font-size:11px;color:var(--color-text-secondary)}
+input[type=text],select{width:100%;padding:7px 10px;font-size:13px;border-radius:8px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-sans)}
+</style>
+
+<div class="app">
+  <div class="header">
+    <div class="header-title">IV-WATCH MONITOR SYSTEM</div>
+    <div class="header-time" id="clock">--:--:--</div>
+  </div>
+
+  <div id="setupSection">
+    <div class="setup-card">
+      <div class="setup-title">Patient Information</div>
+      <div class="inp-row">
+        <div class="inp-group">
+          <div class="inp-label">Patient name</div>
+          <input type="text" id="patName" placeholder="e.g. Juan Dela Cruz" value="Juan Dela Cruz">
+        </div>
+        <div class="inp-group">
+          <div class="inp-label">Room / bed</div>
+          <input type="text" id="patRoom" placeholder="e.g. Room 204-A" value="Room 204-A">
+        </div>
+      </div>
+      <div class="inp-row">
+        <div class="inp-group">
+          <div class="inp-label">IV fluid type</div>
+          <select id="ivType">
+            <option>PNSS 1L (Plain NSS)</option>
+            <option>D5LR 1L</option>
+            <option>D5W 500mL</option>
+            <option>PLRS 1L (Lactated Ringer's)</option>
+            <option>D5NM 500mL</option>
+          </select>
+        </div>
+        <div class="inp-group">
+          <div class="inp-label">Doctor's order (dpm)</div>
+          <input type="text" id="orderDPM" placeholder="e.g. 60" value="60">
+        </div>
+      </div>
+      <div class="inp-row">
+        <div class="inp-group">
+          <div class="inp-label">Volume to infuse (mL)</div>
+          <input type="text" id="totalVol" placeholder="e.g. 1000" value="1000">
+        </div>
+        <div class="inp-group">
+          <div class="inp-label">Attending nurse</div>
+          <input type="text" id="nurseName" placeholder="e.g. RN Santos" value="RN Santos">
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-blue" style="width:100%;margin-bottom:10px" onclick="startMonitor()">Start IV Monitor</button>
+  </div>
+
+  <div id="monitorSection" style="display:none">
+    <div class="lcd">
+      <div class="lcd-line" id="lcd1">IV Watch Ready  </div>
+      <div class="lcd-line" id="lcd2">Monitor: ON     </div>
+    </div>
+
+    <div class="patient-card">
+      <div class="patient-header">
+        <div class="avatar" id="avatarEl">JD</div>
+        <div>
+          <div class="patient-name" id="dispName">Juan Dela Cruz</div>
+          <div class="patient-sub" id="dispRoom">Room 204-A</div>
+        </div>
+      </div>
+      <div class="patient-fields">
+        <div class="field"><div class="field-label">IV fluid</div><div class="field-val" id="dispFluid">PNSS 1L</div></div>
+        <div class="field"><div class="field-label">Doctor's order</div><div class="field-val" id="dispOrder">60 dpm</div></div>
+        <div class="field"><div class="field-label">Attending nurse</div><div class="field-val" id="dispNurse">RN Santos</div></div>
+        <div class="field"><div class="field-label">Status</div><div class="field-val" id="dispStatus">Infusing</div></div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat"><div class="stat-n" id="sDPM">0</div><div class="stat-l">drops/min</div></div>
+      <div class="stat"><div class="stat-n" id="sVol">0</div><div class="stat-l">mL infused</div></div>
+      <div class="stat"><div class="stat-n" id="sRem">1000</div><div class="stat-l">mL remaining</div></div>
+      <div class="stat"><div class="stat-n" id="sETA">--</div><div class="stat-l">hr to finish</div></div>
+    </div>
+
+    <div class="status-row">
+      <div class="pill p-off" id="pFlow">Flow</div>
+      <div class="pill p-off" id="pRate">Rate</div>
+      <div class="pill p-off" id="pVol">Volume</div>
+      <div class="pill p-off" id="pAlarm">Alarm</div>
+    </div>
+
+    <div class="reg-card">
+      <div class="reg-top">
+        <div class="reg-label">Drip rate regulator</div>
+        <div class="reg-val"><span id="rateNum">60</span> dpm</div>
+      </div>
+      <input type="range" min="0" max="120" value="60" step="1" id="rateSlider" style="width:100%" oninput="adjustRate(this.value)">
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--color-text-secondary);margin-top:4px">
+        <span>0 — stopped</span><span style="color:#854F0B">30 — low</span><span>120 — max</span>
+      </div>
+      <div class="drop-row" id="dropRow">
+        <span style="font-size:11px;color:var(--color-text-secondary)">Drip:</span>
+        <div class="drop" id="dp0"></div><div class="drop" id="dp1"></div><div class="drop" id="dp2"></div>
+        <div class="drop" id="dp3"></div><div class="drop" id="dp4"></div>
+        <span style="font-size:11px;color:var(--color-text-secondary);margin-left:4px" id="dropLabel">flowing</span>
+      </div>
+    </div>
+
+    <div class="nurse-card" id="nurseAlert">
+      <div class="nurse-title">Nurse Station Alert</div>
+      <div class="nurse-msg" id="nurseMsg">Checking...</div>
+    </div>
+
+    <div class="log-card">
+      <div class="log-title">Alarm history log</div>
+      <div class="log-list" id="logList">
+        <div style="font-size:12px;color:var(--color-text-secondary);padding:8px 0">No events yet.</div>
+      </div>
+    </div>
+
+    <div class="btns">
+      <button class="btn btn-green" onclick="adjustRate(document.getElementById('orderDPM').value)">Reset to order</button>
+      <button class="btn btn-red" onclick="stopMonitor()">Stop monitor</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let running=false, dpm=60, orderDpm=60, totalVol=1000, mlInfused=0;
+let dropI=0, dropInt=null, alarmInt=null, clockInt=null, statsInt=null;
+let lastState='', logArr=[];
+let alarmFlip=false;
+
+function pad2(n){return String(n).padStart(2,'0')}
+function initials(name){return name.trim().split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'PT'}
+function fmtTime(){let d=new Date();return pad2(d.getHours())+':'+pad2(d.getMinutes())+':'+pad2(d.getSeconds())}
+function padLCD(s,n){return (s+'                ').slice(0,n||16)}
+
+function setLCD(r1,r2){
+  document.getElementById('lcd1').textContent=padLCD(r1);
+  document.getElementById('lcd2').textContent=padLCD(r2);
+}
+
+function addLog(msg,type){
+  logArr.unshift({t:fmtTime(),msg,type});
+  if(logArr.length>20)logArr.pop();
+  renderLog();
+}
+
+function renderLog(){
+  const el=document.getElementById('logList');
+  if(!logArr.length){el.innerHTML='<div style="font-size:12px;color:var(--color-text-secondary);padding:8px 0">No events yet.</div>';return;}
+  el.innerHTML=logArr.map(e=>`<div class="log-item"><span class="log-time">${e.t}</span><span class="log-msg">${e.msg}</span><span class="log-badge badge-${e.type}">${e.type}</span></div>`).join('');
+}
+
+function startMonitor(){
+  const name=document.getElementById('patName').value||'Patient';
+  const room=document.getElementById('patRoom').value||'--';
+  const fluid=document.getElementById('ivType').value;
+  const nurse=document.getElementById('nurseName').value||'--';
+  orderDpm=parseInt(document.getElementById('orderDPM').value)||60;
+  totalVol=parseInt(document.getElementById('totalVol').value)||1000;
+  dpm=orderDpm; mlInfused=0;
+
+  document.getElementById('dispName').textContent=name;
+  document.getElementById('dispRoom').textContent=room;
+  document.getElementById('dispFluid').textContent=fluid.split(' ')[0]+' '+fluid.split(' ')[1];
+  document.getElementById('dispOrder').textContent=orderDpm+' dpm';
+  document.getElementById('dispNurse').textContent=nurse;
+  document.getElementById('dispStatus').textContent='Infusing';
+  document.getElementById('avatarEl').textContent=initials(name);
+  document.getElementById('rateSlider').value=dpm;
+  document.getElementById('rateNum').textContent=dpm;
+  document.getElementById('sRem').textContent=totalVol;
+
+  document.getElementById('setupSection').style.display='none';
+  document.getElementById('monitorSection').style.display='block';
+  running=true;
+
+  setLCD('IV Watch Ready','Monitor: ON');
+  addLog('Monitor started — '+orderDpm+' dpm','ok');
+
+  clockInt=setInterval(()=>{document.getElementById('clock').textContent=fmtTime();},1000);
+  startDropLoop();
+  alarmInt=setInterval(updateAlarm,600);
+  statsInt=setInterval(updateStats,1000);
+}
+
+function stopMonitor(){
+  running=false;
+  clearInterval(clockInt);clearInterval(dropInt);clearInterval(alarmInt);clearInterval(statsInt);
+  document.getElementById('setupSection').style.display='block';
+  document.getElementById('monitorSection').style.display='none';
+  document.getElementById('nurseAlert').style.display='none';
+  for(let i=0;i<5;i++)document.getElementById('dp'+i).classList.remove('on');
+  addLog('Monitor stopped','ok');
+  logArr=[];
+}
+
+function adjustRate(v){
+  dpm=parseInt(v);
+  document.getElementById('rateNum').textContent=dpm;
+  document.getElementById('rateSlider').value=dpm;
+  clearInterval(dropInt);
+  if(running)startDropLoop();
+}
+
+function startDropLoop(){
+  clearInterval(dropInt);
+  if(dpm===0)return;
+  const ms=Math.round(60000/dpm);
+  dropInt=setInterval(()=>{
+    if(!running)return;
+    const d=document.getElementById('dp'+(dropI%5));
+    d.classList.add('on');
+    setTimeout(()=>d.classList.remove('on'),150);
+    dropI++;
+  },ms);
+}
+
+function updateStats(){
+  if(!running)return;
+  const inc=dpm/60/20;
+  mlInfused=Math.min(mlInfused+inc,totalVol);
+  const rem=Math.max(totalVol-mlInfused,0);
+  document.getElementById('sVol').textContent=mlInfused.toFixed(1);
+  document.getElementById('sRem').textContent=rem.toFixed(1);
+  document.getElementById('sDPM').textContent=dpm;
+  const eta=dpm>0?(rem/(dpm/20/60)/60):Infinity;
+  document.getElementById('sETA').textContent=isFinite(eta)?eta.toFixed(1):'--';
+  if(rem<=0){
+    document.getElementById('dispStatus').textContent='Completed';
+    addLog('IV bag empty — replace bag','alert');
+    adjustRate(0);
+  }
+}
+
+function updateAlarm(){
+  if(!running)return;
+  let state='ok';
+  if(dpm===0)state='alert';
+  else if(dpm<30||dpm>orderDpm+15)state='warn';
+
+  const na=document.getElementById('nurseAlert');
+  const nm=document.getElementById('nurseMsg');
+
+  if(state==='alert'){
+    setLCD('!! NO DRIP !!','Check IV line!');
+    document.getElementById('pFlow').className='pill p-alert blink';document.getElementById('pFlow').textContent='No flow';
+    document.getElementById('pRate').className='pill p-alert';document.getElementById('pRate').textContent='0 dpm';
+    document.getElementById('pVol').className='pill p-off';document.getElementById('pVol').textContent='Volume';
+    document.getElementById('pAlarm').className='pill p-alert blink';document.getElementById('pAlarm').textContent='ALARM ON';
+    na.style.display='block';
+    nm.textContent='URGENT: No drip detected in '+document.getElementById('dispName').textContent+' ('+document.getElementById('dispRoom').textContent+'). Immediate nurse response required.';
+    if(state!==lastState){addLog('No drip detected — alarm triggered','alert');lastState=state;}
+    document.getElementById('dropLabel').textContent='stopped';
+  } else if(state==='warn'){
+    setLCD('LOW / HIGH RATE',dpm+' dpm warning');
+    document.getElementById('pFlow').className='pill p-warn';document.getElementById('pFlow').textContent='Low/high';
+    document.getElementById('pRate').className='pill p-warn blink';document.getElementById('pRate').textContent=dpm+' dpm';
+    document.getElementById('pVol').className='pill p-ok';document.getElementById('pVol').textContent='Flowing';
+    document.getElementById('pAlarm').className='pill p-warn blink';document.getElementById('pAlarm').textContent='WARNING';
+    na.style.display='block';
+    nm.textContent='WARNING: Drip rate out of range ('+dpm+' dpm) for '+document.getElementById('dispName').textContent+'. Order: '+orderDpm+' dpm. Please verify.';
+    if(state!==lastState){addLog('Rate out of range — '+dpm+' dpm','warn');lastState=state;}
+    document.getElementById('dropLabel').textContent='low/high';
+  } else {
+    setLCD('Drip OK '+dpm+'dpm','mL:'+mlInfused.toFixed(0)+' NORMAL');
+    document.getElementById('pFlow').className='pill p-ok';document.getElementById('pFlow').textContent='Flowing';
+    document.getElementById('pRate').className='pill p-ok';document.getElementById('pRate').textContent=dpm+' dpm';
+    document.getElementById('pVol').className='pill p-ok';document.getElementById('pVol').textContent='Normal';
+    document.getElementById('pAlarm').className='pill p-off';document.getElementById('pAlarm').textContent='Alarm off';
+    na.style.display='none';
+    if(state!==lastState){addLog('Drip normal — '+dpm+' dpm','ok');lastState=state;}
+    document.getElementById('dropLabel').textContent='flowing';
+  }
+}
+
+setInterval(()=>{document.getElementById('clock').textContent=fmtTime();},1000);
+</script>
